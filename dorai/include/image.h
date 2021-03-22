@@ -7,23 +7,31 @@
 class Image {
 public:
     Image(int h, int w, int c) : _h(h), _w(w), _c(c) {
-        _img = cv::Mat({ h, w, c }, CV_8UC3);
+        _data = new double[(long long)h * w * c]; // BUGABLE: overflow 가능성 있음
     };
-    Image() {
+    Image(): _h(0), _w(0), _c(0), _data(nullptr) {
     };
-    ~Image() {};
+
+    Image(Image& p): _h(p._h), _w(p._w), _c(p._c), _data(p._data) {
+        // BUGABLE: 복사생성자 이렇게 쓰는게 맞나..?
+    };
+
+    
+    ~Image() {
+        delete[] _data;
+    };
 
     void normalize();
     void applyThreshold(double t);
     void zero(); // set all pixels as zero
     void rotate(); // rotate 90 degrees
 
-    void show(char* name);
+    void show(const char* name);
     void showImageLayers(char* name);
 
+    void make(int h, int w, int c);
     void makeRandomImage(int h, int w, int c);
     void makeRandomKernel(int size, int c);
-    void copyFrom(Image p);
     void loadFromFile(std::string filename);
 
     double getPixel(int x, int y, int c);
@@ -42,5 +50,4 @@ private:
     int _w;
     int _c;
     double* _data;
-    cv::Mat _img;
 };

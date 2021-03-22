@@ -19,9 +19,9 @@ void test_backpropagate()
     int n = 3;
     int size = 4;
     int stride = 10;
-    Image* image = new Image();
-    image->loadFromFile("dog.jpg");
-    //show_image(dog, "Test Backpropagate Input");
+    Image* dog = new Image();
+    dog->loadFromFile("images/dog.jpg");
+    dog->show("Test Backpropagate Input");
     //image dog_copy = copy_image(dog);
     //convolutional_layer cl = make_convolutional_layer(dog.h, dog.w, dog.c, n, size, stride);
     //run_convolutional_layer(dog, cl);
