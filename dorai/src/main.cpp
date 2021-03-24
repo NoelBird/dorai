@@ -10,6 +10,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "image.h"
+#include "main.h"
 
 using namespace cv;
 
@@ -22,8 +23,8 @@ void test_backpropagate()
     Image* dog = new Image();
     dog->loadFromFile("images/dog.jpg");
     dog->show("Test Backpropagate Input");
-    //image dog_copy = copy_image(dog);
-    //convolutional_layer cl = make_convolutional_layer(dog.h, dog.w, dog.c, n, size, stride);
+    Image dog_copy(*dog);
+    // convolutional_layer cl = make_convolutional_layer(dog.h, dog.w, dog.c, n, size, stride);
     //run_convolutional_layer(dog, cl);
     //show_image(cl.output, "Test Backpropagate Output");
     //int i;
@@ -45,17 +46,87 @@ void test_backpropagate()
     //show_image(dog, "Test Backpropagate Difference");
 }
 
+void test_color() {
+    Image dog;
+    dog.loadFromFile("images/test_color.png");
+    dog.showImageLayers("Test Color");
+}
+
+void test_load() {
+    Image* dog = new Image();
+    dog->loadFromFile("images/test_dog.jpg");
+    dog->show("dog");
+    dog->showImageLayers("dogLabels");
+    delete dog;
+}
+
+void test_upsample() {
+    Image* dog = new Image();
+
+    dog->loadFromFile("images/dog.jpg");
+    int n = 3;
+    Image* up = new Image(n * dog->getHeight() , n * dog->getWidth(), dog->getChannel());
+    dog->upsample(n, up);
+    dog->show("Test Upsample");
+    up->showImageLayers("Test Upsample");
+
+    delete dog;
+    delete up;
+}
+
+void test_rotate()
+{
+    int i;
+    Image* dog = new Image();
+    dog->loadFromFile("images/dog.jpg");
+    clock_t start = clock(), end;
+    for (i = 0; i < 1001; ++i) {
+        dog->rotate();
+    }
+    end = clock();
+    printf("Rotations: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+    dog->show("Test Rotate");
+
+    Image* random = new Image();
+    random = random->makeRandomImage(3, 3, 3);
+    random->show("Test Rotate Random");
+    random->rotate();
+    random->show("Test Rotate Random");
+    random->rotate();
+    random->show("Test Rotate Random");
+}
+
+void test_convolve()
+{
+    Image* dog = new Image();
+    dog->loadFromFile("images/dog.jpg");
+    dog->showImageLayers("Dog");
+    printf("dog channels %d\n", dog->getChannel());
+    /*image kernel = make_random_image(3, 3, dog.c);
+    image edge = make_image(dog.h, dog.w, 1);
+    int i;
+    clock_t start = clock(), end;
+    for (i = 0; i < 1000; ++i) {
+        convolve(dog, kernel, 1, 0, edge);
+    }
+    end = clock();
+    printf("Convolutions: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+    show_image_layers(edge, "Test Convolve");*/
+}
+
 int main()
 {
-    test_backpropagate();
+    //TODO
+    //test_backpropagate();
     //test_convolve();
-    //test_upsample();
-    //test_rotate();
-    //test_load();
     /*test_network();*/
     //test_convolutional_layer();
+    
+    //DONE
+    //test_load();
     //test_color();
-    cv::waitKey(0);
+    //test_upsample();
+    test_rotate();
     cv::waitKey(0);
     
     return 0;

@@ -12,8 +12,9 @@ public:
     Image(): _h(0), _w(0), _c(0), _data(nullptr) {
     };
 
-    Image(Image& p): _h(p._h), _w(p._w), _c(p._c), _data(p._data) {
-        // BUGABLE: 복사생성자 이렇게 쓰는게 맞나..?
+    Image(Image& p): _h(p._h), _w(p._w), _c(p._c), _data(nullptr) {
+        _data = new double[(long long)_h * _w * _c]; // TODO: 이런 식으로 index를 쓰는게 맞나..? 고치기
+        memcpy(_data, p._data, (long long)_h * _w * _c * sizeof(double));
     };
 
     
@@ -27,10 +28,10 @@ public:
     void rotate(); // rotate 90 degrees
 
     void show(const char* name);
-    void showImageLayers(char* name);
+    void showImageLayers(const char* name);
 
     void make(int h, int w, int c);
-    void makeRandomImage(int h, int w, int c);
+    Image* makeRandomImage(int h, int w, int c);
     void makeRandomKernel(int size, int c);
     void loadFromFile(std::string filename);
 
@@ -38,10 +39,30 @@ public:
     double getPixelExtend(int x, int y, int c);
     void setPixel(int x, int y, int c, double val);
 
-    Image getImageLayer(int l);
+    Image* getImageLayer(int l)
+    {
+        Image* out = new Image(_h, _w, 1);
+        int i;
+        for (i = 0; i < _h * _w; ++i) {
+            out->_data[i] = _data[i + l * _h * _w];
+        }
+        return out;
+    }
+
+    int getHeight() {
+        return _h;
+    }
+
+    int getWidth() {
+        return _w;
+    }
+
+    int getChannel() {
+        return _c;
+    }
 
     void twoDConvolve(int mc, Image kernel, int kc, int stride, Image out, int oc);
-    void upsample(int stride, Image out);
+    void upsample(int stride, Image* out);
     void convolve(Image kernel, int stride, int channel, Image out);
     void backConvolve(Image kernel, int stride, int channel, Image out);
     void kernelUpdate(Image update, int stride, int channel, Image out);
