@@ -25,6 +25,7 @@ public:
     void normalize();
     void applyThreshold(double t);
     void zero(); // set all pixels as zero
+    void zeroChannel(int c);
     void rotate(); // rotate 90 degrees
 
     void show(const char* name);
@@ -38,6 +39,7 @@ public:
     double getPixel(int x, int y, int c);
     double getPixelExtend(int x, int y, int c);
     void setPixel(int x, int y, int c, double val);
+    void addPixel(int x, int y, int c, double val);
 
     Image* getImageLayer(int l)
     {
@@ -61,9 +63,9 @@ public:
         return _c;
     }
 
-    void twoDConvolve(int mc, Image kernel, int kc, int stride, Image out, int oc);
+    void twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, int oc);
     void upsample(int stride, Image* out);
-    void convolve(Image kernel, int stride, int channel, Image out);
+    void convolve(Image* kernel, int stride, int channel, Image* out);
     void backConvolve(Image kernel, int stride, int channel, Image out);
     void kernelUpdate(Image update, int stride, int channel, Image out);
 private:

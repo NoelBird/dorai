@@ -59,6 +59,12 @@ double Image::getPixel(int x, int y, int c)
     return _data[c * _h * _w + x * _w + y];
 }
 
+double Image::getPixelExtend(int x, int y, int c)
+{
+    if (x < 0 || x >= _h || y < 0 || y >= _w || c < 0 || c >= _c) return 0;
+    return getPixel(x, y, c);
+}
+
 void Image::setPixel(int x, int y, int c, double val)
 {
     assert(x < _h&& y < _w&& c < _c);
@@ -98,6 +104,11 @@ void Image::normalize()
 void Image::zero()
 {
     memset(_data, 0, _h * _w * _c * sizeof(double)); // overflow 가능성 있음
+}
+
+void Image::zeroChannel(int c)
+{
+    memset(&(_data[c * _h * _w]), 0, _h * _w * sizeof(double)); // overflow 가능성 있음
 }
 
 void Image::rotate()
@@ -153,6 +164,29 @@ void Image::showImageLayers(const char* name)
     }
 }
 
+void Image::twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, int oc)
+{
+
+    int x, y, i, j;
+    for (x = 0; x < _h; x += stride) {
+        for (y = 0; y < _w; y += stride) {
+            double sum = 0;
+            for (i = 0; i < kernel->getHeight(); ++i) {
+                for (j = 0; j < kernel->getWidth(); ++j) {
+                    sum += kernel->getPixel(i, j, kc) * this->getPixelExtend(x + i - kernel->getHeight() / 2, y + j - kernel->getWidth() / 2, mc);
+                }
+            }
+            out->addPixel(x / stride, y / stride, oc, sum);
+        }
+    }
+}
+
+void Image::addPixel(int x, int y, int c, double val)
+{
+    assert(x < _h&& y < _w&& c < _c);
+    _data[c * _h * _w + x * _w + y] += val;
+}
+
 void Image::upsample(int stride, Image* out)
 {
 
@@ -166,4 +200,23 @@ void Image::upsample(int stride, Image* out)
             }
         }
     }
+}
+
+void Image::convolve(Image* kernel, int stride, int channel, Image* out)
+{
+    assert(_c == kernel->getChannel());
+    int i;
+    out->zeroChannel(channel);
+    for (i = 0; i < _c; ++i) {
+        twoDConvolve(i, kernel, i, stride, out, channel);
+    }
+    /*
+    int j;
+    for(i = 0; i < m.h; i += stride){
+        for(j = 0; j < m.w; j += stride){
+            double val = single_convolve(m, kernel, i, j);
+            set_pixel(out, i/stride, j/stride, channel, val);
+        }
+    }
+    */
 }

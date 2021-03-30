@@ -10,7 +10,6 @@
 
 #include "opencv2/opencv.hpp"
 #include "image.h"
-#include "main.h"
 
 using namespace cv;
 
@@ -102,23 +101,26 @@ void test_convolve()
     dog->loadFromFile("images/dog.jpg");
     dog->showImageLayers("Dog");
     printf("dog channels %d\n", dog->getChannel());
-    /*image kernel = make_random_image(3, 3, dog.c);
-    image edge = make_image(dog.h, dog.w, 1);
+    Image* kernel = new Image();
+    kernel->makeRandomImage(3, 3, dog->getChannel());
+    Image* edge = new Image();
+    edge->make(dog->getHeight(), dog->getWidth(), 1);
     int i;
     clock_t start = clock(), end;
     for (i = 0; i < 1000; ++i) {
-        convolve(dog, kernel, 1, 0, edge);
+        dog->convolve(kernel, 1, 0, edge);
     }
     end = clock();
     printf("Convolutions: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
-    show_image_layers(edge, "Test Convolve");*/
+    edge->showImageLayers("Test Convolve");
 }
+
 
 int main()
 {
     //TODO
     //test_backpropagate();
-    //test_convolve();
+    test_convolve();
     /*test_network();*/
     //test_convolutional_layer();
     
@@ -126,7 +128,7 @@ int main()
     //test_load();
     //test_color();
     //test_upsample();
-    test_rotate();
+    //test_rotate();
     cv::waitKey(0);
     
     return 0;
