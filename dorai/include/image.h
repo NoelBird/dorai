@@ -4,6 +4,8 @@
 #include <string>
 #include "opencv2/imgproc/imgproc_c.h"
 
+class MaxpoolLayer;
+
 class Image {
 public:
     Image(int h, int w, int c) : _h(h), _w(w), _c(c) {
@@ -73,4 +75,5 @@ private:
     int _w;
     int _c;
     double* _data;
+    friend class MaxpoolLayer;
 };

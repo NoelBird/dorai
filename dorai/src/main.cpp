@@ -1,8 +1,8 @@
 //#include "connected_layer.h"
-//#include "convolutional_layer.h"
-//#include "maxpool_layer.h"
 //#include "network.h"
-//#include "image.h"
+#include "image.h"
+#include "convolutional_layer.h"
+#include "maxpool_layer.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -114,13 +114,35 @@ void test_convolve()
     edge->show("Test Convolve");
 }
 
+void test_convolutional_layer()
+{
+
+    srand(0);
+    Image* dog = new Image();
+    dog->loadFromFile("images/test_dog.jpg");
+    int n = 5;
+    int stride = 1;
+    int size = 8;
+    /*ConvolutionalLayer layer(dog->getHeight(), dog->getWidth(), dog->getChannel(), n, size, stride);
+    char buff[256];
+    for (int i = 0; i < n; ++i) {
+        sprintf_s(buff, "Kernel %d", i);
+        layer.getKernel(i)->show(buff);
+    }
+    layer.run(dog);
+
+    MaxpoolLayer mlayer(layer.getOutput()->getHeight(), layer.getOutput()->getWidth(), layer.getOutput()->getChannel(), 3);
+    layer.run(layer.getOutput());
+
+    mlayer.getOutput()->show("Test Maxpool Layer");*/
+}
 
 int main()
 {
     //TODO
     //test_backpropagate();
     /*test_network();*/
-    //test_convolutional_layer();
+    test_convolutional_layer();
     
     //DONE
     //test_load();

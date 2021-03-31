@@ -150,11 +150,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\convolutional_layer.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\maxpool_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\convolutional_layer.h" />
     <ClInclude Include="include\image.h" />
+    <ClInclude Include="include\maxpool_layer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
