@@ -87,7 +87,7 @@ void test_rotate()
     dog->show("Test Rotate");
 
     Image* random = new Image();
-    random = random->makeRandomImage(3, 3, 3);
+    random->makeRandomImage(3, 3, 3);
     random->show("Test Rotate Random");
     random->rotate();
     random->show("Test Rotate Random");
@@ -103,11 +103,21 @@ void test_convolve()
     printf("dog channels %d\n", dog->getChannel());
     Image* kernel = new Image();
     kernel->makeRandomImage(3, 3, dog->getChannel());
+    kernel->setPixel(0, 0, 0, -1);
+    kernel->setPixel(0, 1, 0, 0);
+    kernel->setPixel(0, 2, 0, 1);
+    kernel->setPixel(1, 0, 0, -1);
+    kernel->setPixel(1, 1, 0, 0);
+    kernel->setPixel(1, 2, 0, 1);
+    kernel->setPixel(2, 0, 0, -1);
+    kernel->setPixel(2, 1, 0, 0);
+    kernel->setPixel(2, 2, 0, 1);
+    kernel->show("kernel");
     Image* edge = new Image();
     edge->make(dog->getHeight(), dog->getWidth(), 1);
     int i;
     clock_t start = clock(), end;
-    for (i = 0; i < 1000; ++i) {
+    for (i = 0; i < 50; ++i) {
         dog->convolve(kernel, 1, 0, edge);
     }
     end = clock();

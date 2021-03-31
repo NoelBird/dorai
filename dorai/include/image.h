@@ -32,7 +32,7 @@ public:
     void showImageLayers(const char* name);
 
     void make(int h, int w, int c);
-    Image* makeRandomImage(int h, int w, int c);
+    void makeRandomImage(int h, int w, int c);
     void makeRandomKernel(int size, int c);
     void loadFromFile(std::string filename);
 

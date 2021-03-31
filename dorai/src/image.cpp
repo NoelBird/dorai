@@ -13,14 +13,19 @@ void Image::make(int h, int w, int c)
     _data = new double[_h * _w * _c];
 }
 
-Image* Image::makeRandomImage(int h, int w, int c)
+void Image::makeRandomImage(int h, int w, int c)
 {
-    Image* out = new Image(h, w, c);
-    int i;
-    for (i = 0; i < h * w * c; ++i) {
-        out->_data[i] = (double)rand() / RAND_MAX;
+    _h = h;
+    _w = w;
+    _c = c;
+
+    srand(time(0));
+
+    _data = new double[_h * _w * _c];
+    for (int i = 0; i < h * w * c; ++i) {
+        _data[i] = (double)rand() / RAND_MAX;
     }
-    return out;
+    return;
 }
 
 void Image::loadFromFile(std::string filename)
@@ -171,9 +176,9 @@ void Image::twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, 
     for (x = 0; x < _h; x += stride) {
         for (y = 0; y < _w; y += stride) {
             double sum = 0;
-            for (i = 0; i < kernel->getHeight(); ++i) {
-                for (j = 0; j < kernel->getWidth(); ++j) {
-                    sum += kernel->getPixel(i, j, kc) * this->getPixelExtend(x + i - kernel->getHeight() / 2, y + j - kernel->getWidth() / 2, mc);
+            for (i = 0; i < kernel->_h; ++i) {
+                for (j = 0; j < kernel->_w; ++j) {
+                    sum += kernel->getPixel(i, j, kc) * this->getPixelExtend(x + i - kernel->_h / 2, y + j - kernel->_w / 2, mc);
                 }
             }
             out->addPixel(x / stride, y / stride, oc, sum);
@@ -204,8 +209,8 @@ void Image::upsample(int stride, Image* out)
 
 void Image::convolve(Image* kernel, int stride, int channel, Image* out)
 {
-    assert(_c == kernel->getChannel());
     int i;
+    assert(_c == kernel->_c);
     out->zeroChannel(channel);
     for (i = 0; i < _c; ++i) {
         twoDConvolve(i, kernel, i, stride, out, channel);
