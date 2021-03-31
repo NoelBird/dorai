@@ -181,7 +181,7 @@ void Image::twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, 
                     sum += kernel->getPixel(i, j, kc) * this->getPixelExtend(x + i - kernel->_h / 2, y + j - kernel->_w / 2, mc);
                 }
             }
-            out->addPixel(x / stride, y / stride, oc, sum);
+            out->addPixel(x, y, oc, sum);
         }
     }
 }

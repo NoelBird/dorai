@@ -103,26 +103,15 @@ void test_convolve()
     printf("dog channels %d\n", dog->getChannel());
     Image* kernel = new Image();
     kernel->makeRandomImage(3, 3, dog->getChannel());
-    kernel->setPixel(0, 0, 0, -1);
-    kernel->setPixel(0, 1, 0, 0);
-    kernel->setPixel(0, 2, 0, 1);
-    kernel->setPixel(1, 0, 0, -1);
-    kernel->setPixel(1, 1, 0, 0);
-    kernel->setPixel(1, 2, 0, 1);
-    kernel->setPixel(2, 0, 0, -1);
-    kernel->setPixel(2, 1, 0, 0);
-    kernel->setPixel(2, 2, 0, 1);
-    kernel->show("kernel");
     Image* edge = new Image();
     edge->make(dog->getHeight(), dog->getWidth(), 1);
-    int i;
     clock_t start = clock(), end;
-    for (i = 0; i < 50; ++i) {
+    for (int i = 0; i < 100; ++i) {
         dog->convolve(kernel, 1, 0, edge);
     }
     end = clock();
     printf("Convolutions: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
-    edge->showImageLayers("Test Convolve");
+    edge->show("Test Convolve");
 }
 
 
@@ -130,7 +119,6 @@ int main()
 {
     //TODO
     //test_backpropagate();
-    test_convolve();
     /*test_network();*/
     //test_convolutional_layer();
     
@@ -139,6 +127,7 @@ int main()
     //test_color();
     //test_upsample();
     //test_rotate();
+    //test_convolve();
     cv::waitKey(0);
     
     return 0;
