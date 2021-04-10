@@ -65,6 +65,18 @@ public:
         return _c;
     }
 
+    double getData(int i) {
+        return _data[i];
+    }
+
+    double* getDataPointer() {
+        return _data;
+    }
+
+    void setData(int i, double val) {
+        _data[i] = val;
+    }
+
     void twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, int oc);
     void upsample(int stride, Image* out);
     void convolve(Image* kernel, int stride, int channel, Image* out);

@@ -3,7 +3,8 @@
 void MaxpoolLayer::run(Image* input)
 {
     int i, j, k;
-    for (i = 0; i < _output->_h * _output->_w * _output->_c; ++i) _output->_data[i] = -DBL_MAX;
+    memset(&_output->_data[0], -DBL_MAX, _output->_h * _output->_w * _output->_c*sizeof(double));
+    /*for (i = 0; i < _output->_h * _output->_w * _output->_c; ++i) _output->_data[i] = -DBL_MAX;*/
     for (i = 0; i < input->_h; ++i) {
         for (j = 0; j < input->_w; ++j) {
             for (k = 0; k < input->_c; ++k) {

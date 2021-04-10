@@ -19,11 +19,25 @@ void Image::makeRandomImage(int h, int w, int c)
     _w = w;
     _c = c;
 
-    srand(time(0));
-
     _data = new double[_h * _w * _c];
     for (int i = 0; i < h * w * c; ++i) {
         _data[i] = (double)rand() / RAND_MAX;
+    }
+    return;
+}
+
+void Image::makeRandomKernel(int size, int c)
+{
+    int pad;
+    if ((pad = (size % 2 == 0))) ++size;
+    this->makeRandomImage(size, size, c);
+    if (pad) {
+        for (int k = 0; k < _c; ++k) {
+            for (int i = 0; i < size; ++i) {
+                setPixel(i, 0, k, 0);
+                setPixel(0, i, k, 0);
+            }
+        }
     }
     return;
 }
