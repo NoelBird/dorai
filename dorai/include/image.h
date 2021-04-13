@@ -4,6 +4,8 @@
 #include <string>
 #include "opencv2/imgproc/imgproc_c.h"
 
+class MaxpoolLayer;
+
 class Image {
 public:
     Image(int h, int w, int c) : _h(h), _w(w), _c(c) {
@@ -25,6 +27,7 @@ public:
     void normalize();
     void applyThreshold(double t);
     void zero(); // set all pixels as zero
+    void subtract(Image* img);
     void zeroChannel(int c);
     void rotate(); // rotate 90 degrees
 
@@ -40,6 +43,7 @@ public:
     double getPixelExtend(int x, int y, int c);
     void setPixel(int x, int y, int c, double val);
     void addPixel(int x, int y, int c, double val);
+    void addPixelExtended(int x, int y, int c, double val);
 
     Image* getImageLayer(int l)
     {
@@ -63,14 +67,28 @@ public:
         return _c;
     }
 
+    double getData(int i) {
+        return _data[i];
+    }
+
+    double* getDataPointer() {
+        return _data;
+    }
+
+    void setData(int i, double val) {
+        _data[i] = val;
+    }
+
     void twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, int oc);
     void upsample(int stride, Image* out);
     void convolve(Image* kernel, int stride, int channel, Image* out);
-    void backConvolve(Image kernel, int stride, int channel, Image out);
+    void backConvolve(Image* kernel, int stride, int channel, Image* out);
+    void singleBackConvolve(Image* kernel, int x, int y, double val);
     void kernelUpdate(Image update, int stride, int channel, Image out);
 private:
     int _h;
     int _w;
     int _c;
     double* _data;
+    friend class MaxpoolLayer;
 };

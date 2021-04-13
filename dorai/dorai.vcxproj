@@ -125,6 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)include;D:\noelbird\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,11 +151,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\connected_layer.cpp" />
+    <ClCompile Include="src\convolutional_layer.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\maxpool_layer.cpp" />
+    <ClCompile Include="src\network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\connected_layer.h" />
+    <ClInclude Include="include\convolutional_layer.h" />
     <ClInclude Include="include\image.h" />
+    <ClInclude Include="include\maxpool_layer.h" />
+    <ClInclude Include="include\network.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
