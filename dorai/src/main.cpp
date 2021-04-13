@@ -24,27 +24,27 @@ void test_backpropagate()
     Image* dog = new Image();
     dog->loadFromFile("images/dog.jpg");
     dog->show("Test Backpropagate Input");
-    Image dog_copy(*dog);
+    Image* dogCopy = new Image(*dog);
     ConvolutionalLayer* cl = new ConvolutionalLayer(dog->getHeight(), dog->getWidth(), dog->getChannel(), n, size, stride);
     cl->run(dog);
     cl->getOutput()->show("Test Backpropagate Output");
-    //int i;
-    //clock_t start = clock(), end;
-    //for (i = 0; i < 100; ++i) {
-    //    backpropagate_layer(dog_copy, cl);
-    //}
-    //end = clock();
-    //printf("Backpropagate: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
-    //start = clock();
-    //for (i = 0; i < 100; ++i) {
-    //    backpropagate_layer_convolve(dog, cl);
-    //}
-    //end = clock();
-    //printf("Backpropagate Using Convolutions: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
-    //show_image(dog_copy, "Test Backpropagate 1");
-    //show_image(dog, "Test Backpropagate 2");
-    //subtract_image(dog, dog_copy);
-    //show_image(dog, "Test Backpropagate Difference");
+
+    clock_t start = clock(), end;
+    for (int i = 0; i < 100; ++i) {
+        cl->backpropagateLayer(dogCopy);
+    }
+    end = clock();
+    printf("Backpropagate: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+    start = clock();
+    for (int i = 0; i < 100; ++i) {
+        cl->backpropagateLayerConvolve(dog);
+    }
+    end = clock();
+    printf("Backpropagate Using Convolutions: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+    dogCopy->show("Test Backpropagate 1");
+    dog->show("Test Backpropagate 2");
+    dog->subtract(dogCopy);
+    dog->show("Test Backpropagate Difference");
 }
 
 void test_color() {
@@ -105,6 +105,7 @@ void test_convolve()
     printf("dog channels %d\n", dog->getChannel());
     Image* kernel = new Image();
     kernel->makeRandomImage(3, 3, dog->getChannel());
+    
     Image* edge = new Image();
     edge->make(dog->getHeight(), dog->getWidth(), 1);
     clock_t start = clock(), end;
@@ -205,18 +206,15 @@ void test_network()
 }
 
 int main()
-{
-    //TODO
-    //test_backpropagate();
-    test_network();
-    
-    //DONE
+{ 
     //test_load();
     //test_color();
     //test_upsample();
     //test_rotate();
     //test_convolve();
     //test_convolutional_layer();
+    //test_network();
+    /*test_backpropagate();*/
     cv::waitKey(0);
     
     return 0;

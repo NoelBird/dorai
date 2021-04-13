@@ -125,6 +125,11 @@ void Image::zero()
     memset(_data, 0, _h * _w * _c * sizeof(double)); // overflow 가능성 있음
 }
 
+void Image::subtract(Image* img)
+{
+    for (int i = 0; i < _h * _w * _c; ++i) _data[i] -= img->_data[i];
+}
+
 void Image::zeroChannel(int c)
 {
     memset(&(_data[c * _h * _w]), 0, _h * _w * sizeof(double)); // overflow 가능성 있음
@@ -195,7 +200,7 @@ void Image::twoDConvolve(int mc, Image* kernel, int kc, int stride, Image* out, 
                     sum += kernel->getPixel(i, j, kc) * this->getPixelExtend(x + i - kernel->_h / 2, y + j - kernel->_w / 2, mc);
                 }
             }
-            out->addPixel(x, y, oc, sum);
+            out->addPixel(x/stride, y/stride, oc, sum);
         }
     }
 }
@@ -204,6 +209,12 @@ void Image::addPixel(int x, int y, int c, double val)
 {
     assert(x < _h&& y < _w&& c < _c);
     _data[c * _h * _w + x * _w + y] += val;
+}
+
+void Image::addPixelExtended(int x, int y, int c, double val)
+{
+    if (x < 0 || x >= _h || y < 0 || y >= _w || c < 0 || c >= _c) return;
+    this->addPixel(x, y, c, val);
 }
 
 void Image::upsample(int stride, Image* out)
@@ -238,4 +249,29 @@ void Image::convolve(Image* kernel, int stride, int channel, Image* out)
         }
     }
     */
+}
+
+void Image::singleBackConvolve(Image* kernel, int x, int y, double val)
+{
+    int i, j, k;
+    for (i = 0; i < kernel->_h; ++i) {
+        for (j = 0; j < kernel->_w; ++j) {
+            for (k = 0; k < kernel->_c; ++k) {
+                double pval = kernel->getPixel(i, j, k) * val;
+                this->addPixelExtended(x + i - kernel->_h / 2, y + j - kernel->_w / 2, k, pval);
+            }
+        }
+    }
+}
+
+void Image::backConvolve(Image* kernel, int stride, int channel, Image* out)
+{
+    assert(_c == kernel->_c);
+    int i, j;
+    for (i = 0; i < _h; i += stride) {
+        for (j = 0; j < _w; j += stride) {
+            double val = out->getPixel(i / stride, j / stride, channel);
+            this->singleBackConvolve(kernel, i, j, val);
+        }
+    }
 }

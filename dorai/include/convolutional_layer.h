@@ -5,7 +5,7 @@ class MaxpoolLayer;
 
 class ConvolutionalLayer {
 public:
-    ConvolutionalLayer(int w, int h, int c, int n, int size, int stride): _n(n), _stride(stride) {
+    ConvolutionalLayer(int h, int w, int c, int n, int size, int stride): _n(n), _stride(stride) {
         _kernels = new Image*[n];
         _kernel_updates = new Image*[n];
         for (int i = 0; i < n; ++i) {
@@ -24,8 +24,8 @@ public:
         delete[]_kernel_updates;
     };
     void run(Image* input);
-    void backpropagateLayer(Image input);
-    void backpropagateLayerConvolve(Image input);
+    void backpropagateLayer(Image* input);
+    void backpropagateLayerConvolve(Image* input);
     Image* getKernel(int i);
     Image* getOutput();
 private:

@@ -13,6 +13,34 @@ void ConvolutionalLayer::run(Image* input)
     }
 }
 
+void ConvolutionalLayer::backpropagateLayer(Image* input)
+{
+    input->zero();
+    for (int i = 0; i < _n; ++i) {
+        input->backConvolve(_kernels[i], _stride, i, _output);
+    }
+}
+
+void ConvolutionalLayer::backpropagateLayerConvolve(Image* input)
+{
+    int i, j;
+    for (int i = 0; i < _n; ++i) {
+        _kernels[i]->rotate();
+    }
+
+    input->zero();
+    _output->upsample(_stride, _upsampled);
+    for (int j = 0; j < input->getChannel(); ++j) {
+        for (i = 0; i < _n; ++i) {
+            _upsampled->twoDConvolve(i, _kernels[i], j, 1, input, j);
+        }
+    }
+
+    for (int i = 0; i < _n; ++i) {
+        _kernels[i]->rotate();
+    }
+}
+
 Image* ConvolutionalLayer::getKernel(int i)
 {
     return _kernels[i];
