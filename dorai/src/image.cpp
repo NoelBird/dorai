@@ -264,6 +264,35 @@ void Image::singleBackConvolve(Image* kernel, int x, int y, double val)
     }
 }
 
+void Image::singleUpdate(Image* update, int x, int y, double error)
+{
+    int i, j, k;
+    for (i = 0; i < update->_h; ++i) {
+        for (j = 0; j < update->_w; ++j) {
+            for (k = 0; k < update->_c; ++k) {
+                double val = this->getPixelExtend(x + i - update->_h / 2, y + j - update->_w / 2, k);
+                update->addPixel(i, j, k, val * error);
+            }
+        }
+    }
+}
+
+void Image::kernelUpdate(Image* update, int stride, int channel, Image* out)
+{
+    assert(_c == update->_c);
+    update->zero();
+    int i, j;
+    for (i = 0; i < _h; i += stride) {
+        for (j = 0; j < _w; j += stride) {
+            double error = out->getPixel(i / stride, j / stride, channel);
+            singleUpdate(update, i, j, error);
+        }
+    }
+    for (i = 0; i < update->_h * update->_w * update->_c; ++i) {
+        update->_data[i] /= (_h / stride) * (_w / stride);
+    }
+}
+
 void Image::backConvolve(Image* kernel, int stride, int channel, Image* out)
 {
     assert(_c == kernel->_c);

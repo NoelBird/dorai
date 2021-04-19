@@ -1,14 +1,16 @@
 #pragma once
 #include"image.h"
+#include "activations.h"
 
 class ConnectedLayer {
 public:
-    ConnectedLayer(int inputs, int outputs);
+    ConnectedLayer(int inputs, int outputs, ACTIVATOR_TYPE activator);
     ~ConnectedLayer();
     void run(double* input);
-    void backpropagate(double* input);
-    void calculateUpdates(double* input);
+    void learn(double* input);
     void update(double step);
+    void backpropagate(double* input);
+    void calculateUpdate(double* input);
     double* getOutput();
 private:
     int _inputs;
@@ -18,4 +20,6 @@ private:
     double* _weight_updates;
     double* _bias_updates;
     double* _output;
+    double (*_activation)(double x);
+    double (*_gradient)(double x);
 };

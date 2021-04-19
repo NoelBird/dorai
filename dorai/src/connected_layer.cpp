@@ -1,19 +1,10 @@
 #include "connected_layer.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-double activation(double x)
-{
-    return x * (x > 0);
-}
-
-double gradient(double x)
-{
-    return (x >= 0);
-}
-
-ConnectedLayer::ConnectedLayer(int inputs, int outputs): _inputs(inputs), _outputs(outputs)
+ConnectedLayer::ConnectedLayer(int inputs, int outputs, ACTIVATOR_TYPE activator): _inputs(inputs), _outputs(outputs)
 {
     _output = new double[outputs];
 
@@ -26,6 +17,20 @@ ConnectedLayer::ConnectedLayer(int inputs, int outputs): _inputs(inputs), _outpu
     _biases = new double[outputs];
     for (int i = 0; i < outputs; ++i)
         _biases[i] = (double)rand() / RAND_MAX;
+
+    if (activator == SIGMOID) {
+        _activation = sigmoidActivation;
+        _gradient = sigmoidGradient;
+    }
+    else if (activator == RELU) {
+        _activation = reluActivation;
+        _gradient = reluGradient;
+    }
+    else if (activator == IDENTITY) {
+        _activation = identityActivation;
+        _gradient = identityGradient;
+    }
+
 
     return;
 }
@@ -45,37 +50,38 @@ void ConnectedLayer::run(double* input)
     for (i = 0; i < _outputs; ++i) {
         _output[i] = _biases[i];
         for (j = 0; j < _inputs; ++j) {
-            _output[i] += input[j] * _weights[i * _outputs + j];
+            _output[i] += input[j] * _weights[i * _inputs + j];
         }
-        _output[i] = activation(_output[i]);
+        _output[i] = _activation(_output[i]);
     }
+}
+
+void ConnectedLayer::learn(double* input)
+{
+    calculateUpdate(input);
+    backpropagate(input);
 }
 
 void ConnectedLayer::backpropagate(double* input)
 {
     int i, j;
-    double* oldInput = new double[_inputs];
-    memcpy(oldInput, input, _inputs * sizeof(double));
-    memset(input, 0, _inputs * sizeof(double));
-
-    for (i = 0; i < _outputs; ++i) {
-        for (j = 0; j < _inputs; ++j) {
-            input[j] += _output[i] * _weights[i * _outputs + j];
-        }
-    }
     for (j = 0; j < _inputs; ++j) {
-        input[j] = input[j] * gradient(oldInput[j]);
+        double grad = _gradient(input[j]);
+        input[j] = 0;
+        for (i = 0; i < _outputs; ++i) {
+            input[j] += _output[i] * _weights[i * _inputs + j];
+        }
+        input[j] *= grad;
     }
-    delete[] oldInput;
 }
 
-void ConnectedLayer::calculateUpdates(double* input)
+void ConnectedLayer::calculateUpdate(double* input)
 {
     int i, j;
     for (i = 0; i < _outputs; ++i) {
         _bias_updates[i] += _output[i];
         for (j = 0; j < _inputs; ++j) {
-            _weight_updates[i * _outputs + j] += _output[i] * input[j];
+            _weight_updates[i * _inputs + j] += _output[i] * input[j];
         }
     }
 }
@@ -91,7 +97,7 @@ void ConnectedLayer::update(double step)
         }
     }
     memset(_bias_updates, 0, _outputs * sizeof(double));
-    memset(_weight_updates, 0, _outputs * _inputs * sizeof(double));
+    memset(_weight_updates, 0, _outputs * _inputs * sizeof(double)); // overflow can occur here.
 }
 
 double* ConnectedLayer::getOutput()

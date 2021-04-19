@@ -178,9 +178,9 @@ void test_network()
     n = 128;
     ConvolutionalLayer* cl5 = new ConvolutionalLayer(cl4->getOutput()->getHeight(), cl4->getOutput()->getWidth(), cl4->getOutput()->getChannel(), n, size, stride);
     MaxpoolLayer* ml3 = new MaxpoolLayer(cl5->getOutput()->getHeight(), cl5->getOutput()->getWidth(), cl5->getOutput()->getChannel(), 4);
-    ConnectedLayer* nl = new ConnectedLayer(ml3->getOutput()->getHeight() * ml3->getOutput()->getWidth() * ml3->getOutput()->getChannel(), 4096);
-    ConnectedLayer* nl2 = new ConnectedLayer(4096, 4096);
-    ConnectedLayer* nl3 = new ConnectedLayer(4096, 1000);
+    ConnectedLayer* nl = new ConnectedLayer(ml3->getOutput()->getHeight() * ml3->getOutput()->getWidth() * ml3->getOutput()->getChannel(), 4096, ACTIVATOR_TYPE::RELU);
+    ConnectedLayer* nl2 = new ConnectedLayer(4096, 4096, ACTIVATOR_TYPE::RELU);
+    ConnectedLayer* nl3 = new ConnectedLayer(4096, 1000, ACTIVATOR_TYPE::RELU);
 
     net->setLayers(0, cl);
     net->setLayers(1, ml);
@@ -205,6 +205,42 @@ void test_network()
     net->getImage()->showImageLayers("Test Network Layer");
 }
 
+void test_ann()
+{
+
+    Network* net = new Network(3);
+    net->setTypes(0,LAYER_TYPE::CONNECTED);
+    net->setTypes(1, LAYER_TYPE::CONNECTED);
+    net->setTypes(2, LAYER_TYPE::CONNECTED);
+
+    ConnectedLayer* nl = new ConnectedLayer(1, 20, RELU);
+    ConnectedLayer* nl2 = new ConnectedLayer(20, 20, RELU);
+    ConnectedLayer* nl3 = new ConnectedLayer(20, 1, RELU);
+
+    net->setLayers(0, &nl);
+    net->setLayers(1, &nl2);
+    net->setLayers(2, &nl3);
+
+    Image* t = new Image(1, 1, 1);
+    int count = 0;
+
+    double avgerr = 0;
+    while (1) {
+        double v = ((double)rand() / RAND_MAX);
+        double truth = v * v;
+        t->setPixel(0, 0, 0, v);
+        net->run(t);
+        double* out = net->getOutput();
+        double err = pow((out[0] - truth), 2.);
+        avgerr = .99 * avgerr + .01 * err;
+        //if(++count % 100000 == 0) printf("%f\n", avgerr);
+        if (++count % 100000 == 0) printf("%f %f :%f AVG %f \n", truth, out[0], err, avgerr);
+        out[0] = truth - out[0];
+        net->learn(t);
+        net->update(.001);
+    }
+}
+
 int main()
 { 
     //test_load();
@@ -214,7 +250,8 @@ int main()
     //test_convolve();
     //test_convolutional_layer();
     //test_network();
-    /*test_backpropagate();*/
+    //test_backpropagate();
+    test_ann();
     cv::waitKey(0);
     
     return 0;

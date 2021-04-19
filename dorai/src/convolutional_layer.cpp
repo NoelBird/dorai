@@ -1,7 +1,5 @@
 #include "convolutional_layer.h"
 
-double convolution_activation(double x);
-
 void ConvolutionalLayer::run(Image* input)
 {
     int i;
@@ -9,8 +7,22 @@ void ConvolutionalLayer::run(Image* input)
         input->convolve(_kernels[i], _stride, i, _output);
     }
     for (i = 0; i < input->getHeight() * input->getWidth() * input->getChannel(); ++i) {
-        input->setData(i, convolution_activation(input->getData(i)));
+        input->setData(i, convolutionActivation(input->getData(i)));
     }
+}
+
+void ConvolutionalLayer::learn(Image* input)
+{
+    int i;
+    for (i = 0; i < _n; ++i) {
+        input->kernelUpdate(_kernel_updates[i], _stride, i, _output);
+    }
+    Image* oldInput = new Image(*input);
+    this->backpropagateLayerConvolve(input);
+    for (i = 0; i < input->getHeight() * input->getWidth() * input->getChannel(); ++i) {
+        input->setData(i, input->getData(i) * convolutionGradient(oldInput->getData(i)));
+    }
+    delete oldInput;
 }
 
 void ConvolutionalLayer::backpropagateLayer(Image* input)
@@ -51,7 +63,12 @@ Image* ConvolutionalLayer::getOutput()
     return _output;
 }
 
-double convolution_activation(double x)
+double convolutionActivation(double x)
 {
     return x * (x > 0);
+}
+
+double convolutionGradient(double x)
+{
+    return (x >= 0);
 }

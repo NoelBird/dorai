@@ -84,7 +84,8 @@ public:
     void convolve(Image* kernel, int stride, int channel, Image* out);
     void backConvolve(Image* kernel, int stride, int channel, Image* out);
     void singleBackConvolve(Image* kernel, int x, int y, double val);
-    void kernelUpdate(Image update, int stride, int channel, Image out);
+    void singleUpdate(Image* update, int x, int y, double error);
+    void kernelUpdate(Image* update, int stride, int channel, Image* out);
 private:
     int _h;
     int _w;

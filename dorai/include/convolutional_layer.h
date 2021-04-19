@@ -24,6 +24,7 @@ public:
         delete[]_kernel_updates;
     };
     void run(Image* input);
+    void learn(Image* input);
     void backpropagateLayer(Image* input);
     void backpropagateLayerConvolve(Image* input);
     Image* getKernel(int i);
@@ -38,3 +39,6 @@ private:
 
     friend class MaxpoolLayer;
 };
+
+double convolutionActivation(double x);
+double convolutionGradient(double x);

@@ -41,6 +41,67 @@ void Network::run(Image* input)
     }
 }
 
+double* Network::getOutput()
+{
+    int i = _n - 1;
+    if (_types[i] == LAYER_TYPE::CONVOLUTIONAL) {
+        ConvolutionalLayer* layer = (ConvolutionalLayer*)_layers[i];
+        return layer->getOutput()->getDataPointer();
+    }
+    else if (_types[i] == LAYER_TYPE::MAXPOOL) {
+        MaxpoolLayer* layer = (MaxpoolLayer*)_layers[i];
+        return layer->getOutput()->getDataPointer();
+    }
+    else if (_types[i] == LAYER_TYPE::CONNECTED) {
+        ConnectedLayer* layer = (ConnectedLayer*)_layers[i];
+        return layer->getOutput();
+    }
+    return 0;
+}
+
+void Network::learn(Image* input)
+{
+    int i;
+    Image* prev;
+    double* prev_p;
+    for (i = _n - 1; i >= 0; --i) {
+        if (i == 0) {
+            prev = input;
+            prev_p = prev->getDataPointer();
+        }
+        else if (_types[i - 1] == LAYER_TYPE::CONVOLUTIONAL) {
+            ConvolutionalLayer* layer = (ConvolutionalLayer*)_layers[i - 1];
+            prev = layer->getOutput();
+            prev_p = prev->getDataPointer();
+        }
+        else if (_types[i - 1] == LAYER_TYPE::MAXPOOL) {
+            MaxpoolLayer* layer = (MaxpoolLayer*)_layers[i - 1];
+            prev = layer->getOutput();
+            prev_p = prev->getDataPointer();
+        }
+        else if (_types[i - 1] == LAYER_TYPE::CONNECTED) {
+            ConnectedLayer* layer = (ConnectedLayer*)_layers[i - 1];
+            prev_p = layer->getOutput();
+        }
+
+        if (_types[i] == LAYER_TYPE::CONVOLUTIONAL) {
+            ConvolutionalLayer* layer = (ConvolutionalLayer*)_layers[i];
+            layer->learn(prev);
+        }
+        else if (_types[i] == LAYER_TYPE::MAXPOOL) {
+            //maxpool_layer layer = *(maxpool_layer *)net.layers[i];
+        }
+        else if (_types[i] == LAYER_TYPE::CONNECTED) {
+            ConnectedLayer* layer = (ConnectedLayer*)_layers[i];
+            layer->learn(prev_p);
+        }
+    }
+}
+
+void Network::update(double step)
+{
+}
+
 void Network::setTypes(int n, LAYER_TYPE t)
 {
     _types[n] = t;

@@ -12,6 +12,9 @@ public:
     Network(int n);
     ~Network();
     void run(Image* input);
+    double* getOutput();
+    void learn(Image* input);
+    void update(double step);
     void setTypes(int n, LAYER_TYPE t);
     void setLayers(int n, void* layer);
     Image* getImage();
